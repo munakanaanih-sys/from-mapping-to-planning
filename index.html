@@ -6,6 +6,9 @@
 <title>من المسح الصفي إلى خطة التدخل – ومضات ذكية مع منى مصطفى</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>try{ if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }catch(e){}</script>
 <style>
 :root{--ink:#1e3a5f;--mut:#6b7280;--line:#e5e7eb;--or:#f97316;--teal:#0d9488;--cl:#D97757;--gold:#fbbf24}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -67,6 +70,8 @@ td input{margin:0;padding:7px 9px}.sw{display:inline-block;width:18px;height:18p
 .warn ul{margin:6px 18px}.det{max-height:240px;overflow:auto;font-size:.8rem;background:#fff;border-radius:10px;margin-top:6px}.det table{margin:0}.det td,.det th{padding:3px 6px;border-bottom:1px solid #f1f5f9;color:#374151}details summary{cursor:pointer;color:var(--teal);font-weight:700;margin-top:4px}
 .qt td.sec{font-size:.75rem;color:var(--mut);width:70px}
 .full{grid-column:1/-1}.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.cpick{border:2px solid var(--line);background:#fff;border-radius:999px;padding:4px 12px;font:inherit;font-weight:700;cursor:pointer}.cpick.on{border-color:var(--teal);background:#f0fdfa;color:#0f766e}.addcls input{flex:1;margin:0}.addcls{flex-wrap:nowrap}
+.prow2{border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:6px}.prow2 .x{justify-self:end}.pcl{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.cpick.sm{padding:2px 9px;font-size:.8rem}
+.pwarn .warn,.pwarn .err{display:block;margin:0}.req{color:#dc2626}.wk input{max-width:110px;margin:0}.wkt{max-width:360px}.wkt td input{max-width:110px}.tpl{margin-top:8px}.inl{display:inline-flex;gap:6px;align-items:center}.inl select{width:auto;margin:0;padding:5px 8px}
 .chip{display:inline-block;background:#f1f5f9;border-radius:999px;padding:2px 10px;margin:2px;font-size:.85rem}
 .checks{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}@media(max-width:620px){.checks{grid-template-columns:1fr}}
 .ck{font-weight:400;display:flex;gap:8px;align-items:center}.ck input{width:auto;margin:0}
@@ -91,6 +96,15 @@ const LOGO_DATA="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQD
 /* ═══════════ UI TEXTS (ar / he / en) ═══════════ */
 const I18N={
 ar:{dir:'rtl',
+  pLang:'لغة الخطة', pLangHint:'الافتراضي: العبرية، وللغة العربية: العربية.', lang_he:'العبرية', lang_ar:'العربية', lang_en:'الإنجليزية',
+  wkSame:'نفس القيمة لكل الصفوف', wkAllN:'حصة في الأسبوع لكل صف من الـ %N', wkEach:'حصة في الأسبوع لكل صف', wkCls:'الصف', wkN:'حصص في الأسبوع',
+  prTotal:'مجموع الحصص المتاحة لهذا البرنامج/الشخص في الأسبوع (لكل الصفوف معًا)', prTarget:'الفئة المستهدفة', prTargetPh:'مثال: طلاب المجال الأدنى في القواعد', prCls:'متاح في الصفوف:',
+  prNeedTotal:'أدخل/ي مجموع الحصص الأسبوعية المتاحة (إلزامي).', prTotalLow:'المجموع يجب أن يكون أكبر من أو يساوي عدد الحصص لكل طالب.',
+  prShort:'لن تحصل كل الصفوف على مجموعة منفصلة؛ ستحدد الخطة الأولويات أو تدمج المجموعات.',
+  mixQ:'دمج طلاب من صفوف مختلفة في مجموعة واحدة', mixYes:'نعم', mixStage:'داخل نفس المرحلة فقط', mixNo:'لا',
+  tplLang:'لغة القالب:', tplDetected:'✓ لغة القالب: %L (اكتُشفت تلقائيًا)', tplUnknown:'لم تُكتشف لغة القالب – اختر/ي:', tplMix:'القالب باللغة %T والخطة باللغة %P: عناوين القالب تبقى باللغة %T وتُضاف بعد كل منها ترجمة بين قوسين، وكل المحتوى يُكتب باللغة %P.',
+  bandsSaved:'المجالات المحفوظة مع التقرير: %B', bandsFromReport:'لم تُحفظ مجالات من المرحلة 1 على هذا الجهاز – سيأخذ Claude المجالات من التقرير نفسه.', bandsForget:'نسيان المجالات المحفوظة',
+  needWeeklyEach:'أدخل/ي عدد الحصص الأسبوعية لكل صف.', needProgHours:'أدخل/ي عدد الحصص لكل طالب في «%P».', needProgTotal:'مجموع الحصص الأسبوعية في «%P» إلزامي، ولا يقل عن عدد الحصص لكل طالب.',
   version:'نسخة %1 من المسح', versionsNote:'في الملف %1 نسخ مختلفة من المسح (أسئلة أو علامات مختلفة). كل صف يُحلَّل حسب نسخته.', colSec:'القسم',
   issTitle:'تنبيهات على الملف – يُستحسن تصحيحها', issOver:'%N علامة أعلى من العلامة القصوى للسؤال', issAbs:'%N طالب بلا علامات لكن مجموعه 0 (غائب، لم يُحسب)', issTot:'%N مجموع مكتوب لا يساوي مجموع العلامات', issNoTot:'%N طالب له علامات بلا مجموع مكتوب',
   issHint:'المنصة تحسب العلامة الزائدة كعلامة قصوى وتستثني الغائبين، لذلك قد يختلف المعدل قليلًا عن ورقة الملخص في الملف. Claude سيضع قائمة كاملة بها في ورقة الملاحظات.', issMore:'عرض التفاصيل', row:'صف', cSheet:'الصف', cWhere:'الخلية', cName:'الطالب', cWhat:'الملاحظة', dOver:'%V من %M', dAbs:'غائب – مجموع 0', dTot:'المجموع %S ≠ المكتوب %T', dNoTot:'بلا مجموع (Σ %S)',
@@ -122,14 +136,14 @@ ar:{dir:'rtl',
   privacy:'🔒 الملفات تُرفقها/تُرفقينها مباشرة في Claude ولا تمر عبر المنصة. يكفي حساب Claude مجاني، والأفضل حساب يتيح إنشاء الملفات.',
   rs1:'اضغط/ي «انسخ/ي البرومبت»، ثم «افتح/ي Claude».', rs2:'أرفق/ي بزر المشبك 📎 ملف الإكسل نفسه%F.',
   rs3:'الصق/ي البرومبت (Ctrl+V) وأرسل/ي. سيُسلّم Claude ملف Excel بالتحليل الكامل وملف Word بالتقرير الملخّص (דוח מסכם) مع رسوم بيانية ومربّعات «תובנות והמלצות».',
-  p2:'تفاصيل خطة التدخل', pCls:'الصفوف التي تُبنى لها الخطة', pClsPh:'اكتب/ي صفًّا آخر، مثال: ז1', pcAdd:'＋ إضافة', pcAll:'اختيار كل الصفوف', pcNone:'إلغاء الاختيار', pcHint:'لم تختر/ي صفوفًا: الخطة ستشمل كل الصفوف المذكورة في الדוח מסכם.', pcSome:'الخطة ستُبنى لـ %N صف/صفوف – قسم خاص لكل صف.', pWeekly:'عدد الحصص الأسبوعية في الموضوع', pWeeklyPh:'مثال: 5',
+  p2:'تفاصيل خطة التدخل', pCls:'الصفوف التي تُبنى لها الخطة', pClsPh:'اكتب/ي صفًّا آخر، مثال: ז1', pcAdd:'＋ إضافة', pcAll:'اختيار كل الصفوف', pcNone:'إلغاء الاختيار', pcHint:'لم تختر/ي صفوفًا: الخطة ستشمل كل الصفوف المذكورة في الדוח מסכם.', pcSome:'الخطة ستُبنى لـ %N صف/صفوف – قسم خاص لكل صف.', pWeekly:'حصص الموضوع العادية في الأسبوع', pWeeklyPh:'مثال: 5',
   pFrom:'بداية تنفيذ الخطة', pTo:'نهاية تنفيذ الخطة', progs:'البرامج والموارد الموجودة (משאבים)',
-  progsHint:'مثال: שעות פרטניות، תל"ן، برنامج تقوية، מרכז למידה… وكم حصة يحصل عليها الطالب من كل برنامج في الأسبوع.',
-  prName:'اسم البرنامج', prNamePh:'مثال: שעות פרטניות', prHours:'حصص للطالب أسبوعيًا', prWho:'لمن', prWhoPh:'مثال: مجموعة الضعف', prStaff:'من يُنفّذ', prStaffPh:'مثال: المعلم/ة',
+  progsHint:'لكل برنامج (مثل שעות פרטניות، תל"ן، برنامج تقوية، מרכז למידה): من يقدّمه، في أي صفوف، كم حصة يحصل عليها الطالب أسبوعيًا، ومجموع الحصص المتاحة له في الأسبوع.',
+  prName:'اسم البرنامج', prNamePh:'مثال: שעות פרטניות', prHours:'عدد الحصص لكل طالب في الأسبوع', prWho:'لمن', prWhoPh:'مثال: مجموعة الضعف', prStaff:'من يقدّمه', prStaffPh:'مثال: المعلم/ة',
   del:'حذف', addProg:'＋ إضافة برنامج', mon:'كيف ستفحص/ين التقدّم؟', monOther:'طريقة أخرى', extra:'ملاحظات إضافية للخطة',
   files:'الملفات التي ستُرفقها/ينها في Claude', fRep:'الדוח מסכם من المرحلة السابقة', fRepSub:'إلزامي في Claude (Word أو PDF)',
   fTpl:'نموذج فارغ لمبنى خطة العمل', fTplSub:'اختياري – إن وُجد، تُبنى الخطة حسبه بالضبط', noTpl:'✕ بدون نموذج',
-  fNote:'المنصة تأخذ اسم الملف فقط لتذكره في البرومبت؛ الملف نفسه تُرفقه/ينه في Claude.',
+  fNote:'المنصة تقرأ القالب داخل المتصفح فقط لتعرف لغته، ولا يُرفع لأي مكان؛ الملفات نفسها تُرفقها/ينها في Claude.',
   p3:'برومبت خطة التدخل لـ Claude',
   needGradeTop:'اختر/ي الصف في بطاقة بيانات المعلم أعلاه.', needOtherTop:'اكتب/ي اسم الموضوع أعلاه.', needWeekly:'أدخل/ي عدد الحصص الأسبوعية.',
   needPeriod:'حدّد/ي فترة تنفيذ الخطة.', badPeriod:'نهاية الفترة يجب أن تكون بعد بدايتها.', needMon:'اختر/ي طريقة واحدة على الأقل لفحص التقدّم.',
@@ -140,6 +154,15 @@ ar:{dir:'rtl',
   monitor:['اختبار/مسح مرحلي في منتصف الفترة (מבדק ביניים)','اختبارات قصيرة دورية (בחנים קצרים)','مهام أداء وأوراق عمل (משימות ביצוע)','ملاحظة صفية مع قائمة تدقيق (תצפית)','ملف أعمال الطالب (פורטפוליו)','مسح ختامي بنفس مبنى المسح (מבדק מסכם)']
 },
 he:{dir:'rtl',
+  pLang:'שפת התוכנית', pLangHint:'ברירת מחדל: עברית, ובמקצוע ערבית: ערבית.', lang_he:'עברית', lang_ar:'ערבית', lang_en:'אנגלית',
+  wkSame:'אותו ערך לכל הכיתות', wkAllN:'שעות בשבוע בכל אחת מ-%N הכיתות', wkEach:'שעות בשבוע בכל כיתה', wkCls:'כיתה', wkN:'שעות בשבוע',
+  prTotal:'סה"כ השעות הזמינות לתוכנית/לאדם בשבוע (לכל הכיתות יחד)', prTarget:'קהל היעד', prTargetPh:'לדוגמה: תלמידי הטווח הנמוך בדקדוק', prCls:'זמין בכיתות:',
+  prNeedTotal:'הזינו את סה"כ השעות השבועיות הזמינות (חובה).', prTotalLow:'הסה"כ צריך להיות גדול או שווה למספר השעות לתלמיד.',
+  prShort:'לא כל הכיתות יקבלו קבוצה נפרדת; התוכנית תקבע סדרי עדיפויות או תמזג קבוצות.',
+  mixQ:'שילוב תלמידים מכיתות שונות באותה קבוצה', mixYes:'כן', mixStage:'רק באותה שכבה', mixNo:'לא',
+  tplLang:'שפת התבנית:', tplDetected:'✓ שפת התבנית: %L (זוהתה אוטומטית)', tplUnknown:'שפת התבנית לא זוהתה – בחרו:', tplMix:'התבנית ב%T והתוכנית ב%P: כותרות התבנית נשארות ב%T ואחרי כל אחת נוסף תרגום בסוגריים, וכל התוכן נכתב ב%P.',
+  bandsSaved:'הטווחים שנשמרו עם הדוח: %B', bandsFromReport:'לא נשמרו טווחים משלב 1 במכשיר הזה – Claude ייקח את הטווחים מהדוח עצמו.', bandsForget:'מחיקת הטווחים השמורים',
+  needWeeklyEach:'הזינו מספר שעות שבועיות לכל כיתה.', needProgHours:'הזינו מספר שעות לתלמיד ב«%P».', needProgTotal:'סה"כ השעות השבועיות ב«%P» הוא חובה, ולא פחות ממספר השעות לתלמיד.',
   version:'גרסה %1 של המבדק', versionsNote:'בקובץ יש %1 גרסאות שונות של המבדק (שאלות או ניקוד שונים). כל כיתה תנותח לפי הגרסה שלה.', colSec:'חלק',
   issTitle:'הערות על הקובץ – כדאי לתקן', issOver:'%N ציונים גבוהים מהניקוד המרבי של השאלה', issAbs:'%N תלמידים בלי ציונים אבל עם סה"כ 0 (נעדרים, לא נספרו)', issTot:'%N סיכומים מוקלדים שאינם שווים לסכום הציונים', issNoTot:'%N תלמידים עם ציונים בלי סה"כ מוקלד',
   issHint:'הפלטפורמה סופרת ציון חורג כניקוד המרבי ולא סופרת נעדרים, ולכן הממוצע עשוי להיות שונה מעט מגיליון הסיכום שבקובץ. Claude ירכז את הרשימה המלאה בגיליון ההערות.', issMore:'הצגת הפרטים', row:'שורה', cSheet:'כיתה', cWhere:'תא', cName:'תלמיד/ה', cWhat:'הערה', dOver:'%V מתוך %M', dAbs:'נעדר/ת – סה"כ 0', dTot:'סכום %S ≠ מוקלד %T', dNoTot:'בלי סה"כ (Σ %S)',
@@ -171,14 +194,14 @@ he:{dir:'rtl',
   privacy:'🔒 את הקבצים מצרפים ישירות ב-Claude, והם לא עוברים דרך הפלטפורמה. מספיק חשבון Claude חינמי; עדיף חשבון שמאפשר יצירת קבצים.',
   rs1:'לחצו «העתקת הפרומפט», ואז «פתיחת Claude».', rs2:'צרפו בכפתור 📎 את אותו קובץ אקסל%F.',
   rs3:'הדביקו את הפרומפט (Ctrl+V) ושלחו. Claude יחזיר קובץ Excel עם הניתוח המלא וקובץ Word עם דוח מסכם, תרשימים ותיבות «תובנות והמלצות».',
-  p2:'פרטי תוכנית ההתערבות', pCls:'הכיתות שעבורן נבנית התוכנית', pClsPh:'הקלידו כיתה נוספת, לדוגמה: ז1', pcAdd:'＋ הוספה', pcAll:'בחירת כל הכיתות', pcNone:'ניקוי הבחירה', pcHint:'לא נבחרו כיתות: התוכנית תכלול את כל הכיתות שמופיעות בדוח המסכם.', pcSome:'התוכנית תיבנה ל-%N כיתות – פרק נפרד לכל כיתה.', pWeekly:'מספר שעות שבועיות במקצוע', pWeeklyPh:'לדוגמה: 5',
+  p2:'פרטי תוכנית ההתערבות', pCls:'הכיתות שעבורן נבנית התוכנית', pClsPh:'הקלידו כיתה נוספת, לדוגמה: ז1', pcAdd:'＋ הוספה', pcAll:'בחירת כל הכיתות', pcNone:'ניקוי הבחירה', pcHint:'לא נבחרו כיתות: התוכנית תכלול את כל הכיתות שמופיעות בדוח המסכם.', pcSome:'התוכנית תיבנה ל-%N כיתות – פרק נפרד לכל כיתה.', pWeekly:'שעות המקצוע הרגילות בשבוע', pWeeklyPh:'לדוגמה: 5',
   pFrom:'תחילת התוכנית', pTo:'סיום התוכנית', progs:'תוכניות ומשאבים קיימים',
-  progsHint:'לדוגמה: שעות פרטניות, תל"ן, תגבור, מרכז למידה… וכמה שעות כל תלמיד מקבל מכל תוכנית בשבוע.',
-  prName:'שם התוכנית', prNamePh:'לדוגמה: שעות פרטניות', prHours:'שעות לתלמיד בשבוע', prWho:'למי', prWhoPh:'לדוגמה: קבוצת החיזוק', prStaff:'מי מעביר', prStaffPh:'לדוגמה: המורה',
+  progsHint:'לכל תוכנית (כמו שעות פרטניות, תל"ן, תגבור, מרכז למידה): מי מעביר, באילו כיתות, כמה שעות כל תלמיד מקבל בשבוע, וסה"כ השעות הזמינות לה בשבוע.',
+  prName:'שם התוכנית', prNamePh:'לדוגמה: שעות פרטניות', prHours:'מספר שעות לכל תלמיד בשבוע', prWho:'למי', prWhoPh:'לדוגמה: קבוצת החיזוק', prStaff:'מי מעביר/ה', prStaffPh:'לדוגמה: המורה',
   del:'מחיקה', addProg:'＋ הוספת תוכנית', mon:'איך תבדקו את ההתקדמות?', monOther:'דרך אחרת', extra:'הערות נוספות לתוכנית',
   files:'הקבצים שתצרפו ב-Claude', fRep:'הדוח המסכם מהשלב הקודם', fRepSub:'חובה ב-Claude (Word או PDF)',
   fTpl:'תבנית ריקה של תוכנית העבודה', fTplSub:'רשות – אם יש, התוכנית תיבנה בדיוק לפיה', noTpl:'✕ בלי תבנית',
-  fNote:'הפלטפורמה לוקחת רק את שם הקובץ כדי לציין אותו בפרומפט; את הקובץ עצמו מצרפים ב-Claude.',
+  fNote:'הפלטפורמה קוראת את התבנית בדפדפן בלבד כדי לזהות את שפתה, ולא מעלה אותה לשום מקום; את הקבצים עצמם מצרפים ב-Claude.',
   p3:'פרומפט לתוכנית התערבות ב-Claude',
   needGradeTop:'בחרו שכבה בכרטיס פרטי המורה למעלה.', needOtherTop:'כתבו את שם המקצוע למעלה.', needWeekly:'הזינו את מספר השעות השבועיות.',
   needPeriod:'קבעו את תקופת התוכנית.', badPeriod:'סיום התקופה צריך להיות אחרי תחילתה.', needMon:'בחרו לפחות דרך אחת לבדיקת ההתקדמות.',
@@ -189,6 +212,15 @@ he:{dir:'rtl',
   monitor:['מבדק ביניים באמצע התקופה','בחנים קצרים תקופתיים','משימות ביצוע ודפי עבודה','תצפית בכיתה עם רשימת תיוג','תלקיט (פורטפוליו)','מבדק מסכם במבנה המבדק המקורי']
 },
 en:{dir:'ltr',
+  pLang:'Plan language', pLangHint:'Default: Hebrew; for the Arabic subject: Arabic.', lang_he:'Hebrew', lang_ar:'Arabic', lang_en:'English',
+  wkSame:'Same value for all classes', wkAllN:'lessons a week in each of the %N classes', wkEach:'lessons a week in each class', wkCls:'Class', wkN:'Lessons a week',
+  prTotal:'Total lessons available to this program/person per week (all classes together)', prTarget:'Target group', prTargetPh:'e.g. lowest-range students in grammar', prCls:'Available in classes:',
+  prNeedTotal:'Enter the total weekly lessons available (required).', prTotalLow:'The total must be at least the lessons per student.',
+  prShort:'Not every class will get a separate group; the plan will set priorities or merge groups.',
+  mixQ:'Mix students from different classes in one group', mixYes:'Yes', mixStage:'Only within the same grade', mixNo:'No',
+  tplLang:'Template language:', tplDetected:'✓ Template language: %L (detected automatically)', tplUnknown:'Template language not detected – choose:', tplMix:'The template is in %T and the plan in %P: the template headings stay in %T, each followed by a translation in brackets, and all content is written in %P.',
+  bandsSaved:'Ranges saved with the report: %B', bandsFromReport:'No ranges from stage 1 are saved on this device – Claude will take the ranges from the report itself.', bandsForget:'Forget the saved ranges',
+  needWeeklyEach:'Enter the weekly lessons for every class.', needProgHours:'Enter the lessons per student in «%P».', needProgTotal:'The weekly total in «%P» is required and must be at least the lessons per student.',
   version:'Screening version %1', versionsNote:'The file has %1 different versions of the screening (different questions or maximum scores). Each class is analysed against its own version.', colSec:'Section',
   issTitle:'Notes on the file – worth correcting', issOver:'%N scores above the question\'s maximum', issAbs:'%N students with no scores but a total of 0 (absent, not counted)', issTot:'%N typed totals that differ from the sum of the scores', issNoTot:'%N students with scores but no typed total',
   issHint:'The platform counts a score above the maximum as the maximum and leaves absent students out, so the averages may differ slightly from the summary sheet in the file. Claude will list every item in the notes sheet.', issMore:'Show details', row:'row', cSheet:'Class', cWhere:'Cell', cName:'Student', cWhat:'Note', dOver:'%V of %M', dAbs:'absent – total 0', dTot:'sum %S ≠ typed %T', dNoTot:'no total (Σ %S)',
@@ -220,14 +252,14 @@ en:{dir:'ltr',
   privacy:'🔒 You attach the files directly in Claude; they never pass through the platform. A free Claude account is enough; one that can create files is best.',
   rs1:'Press «Copy the prompt», then «Open Claude».', rs2:'Attach the same Excel file%F with the 📎 button.',
   rs3:'Paste the prompt (Ctrl+V) and send. Claude will return an Excel file with the full analysis and a Word summary report (דוח מסכם) with charts and «תובנות והמלצות» boxes.',
-  p2:'Intervention-plan details', pCls:'Classes the plan is for', pClsPh:'Type another class, e.g. ז1', pcAdd:'＋ Add', pcAll:'Select all classes', pcNone:'Clear selection', pcHint:'No classes chosen: the plan will cover every class in the summary report.', pcSome:'The plan will be built for %N class(es) – a section for each class.', pWeekly:'Weekly lessons in the subject', pWeeklyPh:'e.g. 5',
+  p2:'Intervention-plan details', pCls:'Classes the plan is for', pClsPh:'Type another class, e.g. ז1', pcAdd:'＋ Add', pcAll:'Select all classes', pcNone:'Clear selection', pcHint:'No classes chosen: the plan will cover every class in the summary report.', pcSome:'The plan will be built for %N class(es) – a section for each class.', pWeekly:'Regular weekly lessons in the subject', pWeeklyPh:'e.g. 5',
   pFrom:'Plan start', pTo:'Plan end', progs:'Available programs and resources (משאבים)',
-  progsHint:'e.g. שעות פרטניות, תל"ן, remedial program, learning centre… and how many lessons each student gets from each program per week.',
+  progsHint:'For each program (e.g. שעות פרטניות, תל"ן, remedial program, learning centre): who delivers it, in which classes, how many lessons each student gets a week, and the total lessons it has a week.',
   prName:'Program name', prNamePh:'e.g. שעות פרטניות', prHours:'Lessons per student per week', prWho:'For whom', prWhoPh:'e.g. support group', prStaff:'Delivered by', prStaffPh:'e.g. the teacher',
   del:'Delete', addProg:'＋ Add a program', mon:'How will you check progress?', monOther:'Another method', extra:'Additional notes for the plan',
   files:'Files you will attach in Claude', fRep:'The summary report from stage 1', fRepSub:'Required in Claude (Word or PDF)',
   fTpl:'A blank work-plan template', fTplSub:'Optional – if attached, the plan follows it exactly', noTpl:'✕ No template',
-  fNote:'The platform only takes the file name to mention it in the prompt; you attach the file itself in Claude.',
+  fNote:'The platform reads the template in your browser only to detect its language and uploads nothing; you attach the files themselves in Claude.',
   p3:'Intervention-plan prompt for Claude',
   needGradeTop:'Choose the grade in the teacher card above.', needOtherTop:'Write the subject name above.', needWeekly:'Enter the weekly lessons.',
   needPeriod:'Set the plan period.', badPeriod:'The end must be after the start.', needMon:'Choose at least one way to check progress.',
@@ -1225,28 +1257,68 @@ ${check}
 
 /* ═══════════ INTERVENTION-PLAN PROMPT (תוכנית התערבות) ═══════════
    Built from the summary report Claude produced in stage 1 (attached by the teacher),
-   the teacher's resources and schedule, and an optional blank plan template. */
+   the teacher's classes, lessons and resources, and an optional blank plan template. */
 function planSubject(subject,otherName){
   const names={arabic:'Arabic language',hebrew:'Hebrew',english:'English',science:'Science and Technology',math:'Mathematics'};
   return subject==='other'?(otherName||'the subject'):(names[subject]||'the subject');
 }
-function planOut(subject,otherLang){ if(subject==='other') return otherLang||'he'; return subject==='arabic'?'ar':'he'; }
+/* default plan language: Hebrew for every subject except Arabic */
+function planDefaultLang(subject){ return subject==='arabic'?'ar':'he'; }
+const PLAN_TXT={
+  ar:{lang:'Modern Standard Arabic',plan:'خطة التدخل',notes:'ملاحظات وافتراضات',prepared:'أُعدّ بمساعدة منصة ومضات ذكية – منى مصطفى',footer:'ومضات ذكية مع منى مصطفى',name:'Arabic'},
+  he:{lang:'Hebrew',plan:'תוכנית התערבות',notes:'הערות והנחות',prepared:'הוכן בסיוע פלטפורמת ניצוצות חכמים – מונא מוסטפא',footer:'ניצוצות חכמים עם מונא מוסטפא',name:'Hebrew'}
+};
+const TPL_LANG_NAME={he:'Hebrew',ar:'Arabic',en:'English'};
+/* the example heading, in the template language, followed by its translation in the plan language */
+const TPL_EXAMPLE={he:'שם המיומנות',ar:'اسم المهارة',en:'Skill name'};
 
-function buildPlanPrompt({teacher,subject,otherName,otherLang,plan,bands}){
-  const CL=(plan.classes||[]).filter(Boolean), many=CL.length>1, none=!CL.length;
-  const STAGE=stageOf(teacher,CL);
-  const clsTxt=none?'all the classes in the summary report':CL.map(c=>`"${c}"`).join(', ');
-  const out=planOut(subject,otherLang), AR=out==='ar', OUT=AR?'Modern Standard Arabic':'Hebrew';
+/* classes the plan covers: the chosen ones, else the classes read in stage 1, else unknown */
+function planClassList(plan,knownClasses){ const CL=(plan.classes||[]).filter(Boolean); return CL.length?CL:(knownClasses||[]); }
+function programClasses(p,list){ const c=(p.classes||[]).filter(x=>list.includes(x)); return c.length?c:list; }
+function programShort(p,list){ const n=Math.max(1,programClasses(p,list).length), h=Number(p.hours)||0, tot=Number(p.total)||0; return h>0&&tot>0&&tot<n*h; }
+
+function buildPlanPrompt({teacher,subject,otherName,plan,reportBands,knownClasses}){
+  const chosen=(plan.classes||[]).filter(Boolean), none=!chosen.length;
+  const LIST=planClassList(plan,knownClasses), many=LIST.length>1||none;
+  const STAGE=stageOf(teacher,LIST);
+  const clsTxt=chosen.map(c=>`"${c}"`).join(', ');
+  const out=plan.lang||planDefaultLang(subject), AR=out==='ar', P=PLAN_TXT[out];
   const subj=planSubject(subject,otherName);
   const stageTxt=STAGE==='elem'?'elementary school':'middle school';
-  const T=AR?{plan:'خطة التدخل',notes:'ملاحظات وافتراضات'}:{plan:'תוכנית התערבות',notes:'הערות והנחות'};
-  const progs=(plan.programs||[]).filter(p=>p.name&&p.name.trim());
-  const progLines=progs.length?progs.map(p=>`   • ${p.name.trim()}: ${p.hours||'?'} lesson(s) per student per week${p.who?` – for: ${p.who}`:''}${p.staff?` – delivered by: ${p.staff}`:''}`).join('\n'):'   • (no additional programs – the plan relies on the regular lessons only)';
+  const T={plan:P.plan,notes:P.notes};
   const weeks=(()=>{ if(!plan.from||!plan.to) return null; const d=(new Date(plan.to)-new Date(plan.from))/864e5; return d>0?Math.round(d/7):null; })();
   const monitor=(plan.monitor||[]).concat(plan.monitorOther?[plan.monitorOther]:[]).filter(Boolean);
-  const bandTxt=bands&&bands.length?bands.map((b,i)=>`"${b.name}" (${bandRangeLabel(bands,i)})`).join(', '):'';
-  const meta=[teacher.name&&`teacher: ${teacher.name}`,teacher.school&&`school: ${teacher.school}`,`class${many||none?'es':''}: ${none?'all in the report':CL.join(', ')}`].filter(Boolean).join(', ');
+  const meta=[teacher.name&&`teacher: ${teacher.name}`,teacher.school&&`school: ${teacher.school}`,`class${many?'es':''}: ${none&&!LIST.length?'all in the report':LIST.join(', ')}`].filter(Boolean).join(', ');
   const hasTpl=!!plan.templateName, hasRep=!!plan.reportName;
+  const tplLang=plan.templateLang||'';
+  const titleCls=none&&!LIST.length?'[classes]':LIST.join(', ');
+
+  /* regular lessons, class by class */
+  const wk=(c)=>plan.weeklySame?plan.weeklyAll:((plan.weekly||{})[c]);
+  const weeklyLines=LIST.length
+    ? (plan.weeklySame
+        ? `- ${subj} lessons per week in the regular timetable: ${plan.weeklyAll||'?'} in each class (${LIST.map(c=>`"${c}"`).join(', ')}).`
+        : `- ${subj} lessons per week in the regular timetable, class by class:\n${LIST.map(c=>`   • "${c}": ${wk(c)||'?'}`).join('\n')}`)
+    : `- ${subj} lessons per week in the regular timetable: ${plan.weeklyAll||'?'} in each class.`;
+
+  /* additional programs */
+  const progs=(plan.programs||[]).filter(p=>p.name&&p.name.trim());
+  const progLines=progs.length?progs.map(p=>{
+    const pc=LIST.length?programClasses(p,LIST):[];
+    const short=LIST.length&&programShort(p,LIST);
+    return `   • ${p.name.trim()}${p.staff?` – delivered by: ${p.staff}`:''} – available in: ${pc.length?pc.map(c=>`"${c}"`).join(', '):'all the classes of the plan'} – ${p.hours||'?'} lesson(s) per student per week${p.target?` – target group: ${p.target}`:''} – total available per week for all these classes together: ${p.total||'?'} lesson(s)${short?` (less than one group in every class: ${pc.length} classes × ${p.hours} = ${pc.length*Number(p.hours)} – prioritise or merge groups as the rules below say)`:''}`;
+  }).join('\n'):'   • (no additional programs – the plan relies on the regular lessons only)';
+  const mix={yes:'allowed',stage:'allowed only between classes of the same grade level',no:'not allowed – every group is from one class'}[plan.mix||'stage'];
+
+  const bandTxt=reportBands&&reportBands.length
+    ? `- Score ranges (المجالات / טווחים) used in the summary report: ${reportBands.map((b,i)=>`"${b.name}" (${bandRangeLabel(reportBands,i)})`).join(', ')}.\n`
+    : `- Score ranges (المجالات / טווחים): use exactly the ranges written in the summary report.\n`;
+
+  const tplRule=!hasTpl?'':(tplLang&&tplLang!==out
+    ? `\n   The template is in ${TPL_LANG_NAME[tplLang]||tplLang} and the plan is in ${P.name}: keep every heading, column name and fixed text of the template exactly as it is, in ${TPL_LANG_NAME[tplLang]||tplLang}, and add after each one its ${P.name} translation in brackets, e.g. "${TPL_EXAMPLE[tplLang]||TPL_EXAMPLE.he} (${TPL_EXAMPLE[out]})". Everything you fill in inside the template is written in ${P.name}.`
+    : (!tplLang
+        ? `\n   If the template is in a language other than ${P.name}, keep every heading, column name and fixed text of the template exactly as it is and add after each one its ${P.name} translation in brackets (e.g. "${AR?'שם המיומנות (اسم المهارة)':'اسم المهارة (שם המיומנות)'}"). Everything you fill in inside the template is written in ${P.name}.`
+        : ''));
 
   return `You are an expert in pedagogical intervention and differentiated teaching, specialising in ${subj} in ${stageTxt} (${STAGE==='elem'?'grades א–ו':'grades ז, ח, ט'}) in Arab schools in Israel, and experienced in writing intervention plans (תוכנית התערבות) that close learning gaps after a class screening.
 
@@ -1255,17 +1327,18 @@ Carry out everything directly, without asking any question or waiting for approv
 
 Attached files:
 1. ${hasRep?`"${plan.reportName}" – `:''}the summary report (דוח מסכם) of the class screening in ${subj}${hasRep?'':' (the Word or PDF file produced in the previous stage; if the detailed Excel analysis is also attached, use it for names and exact figures)'}.
-${hasTpl?`2. "${plan.templateName}" – a BLANK intervention-plan template used by the school. The plan MUST follow this template exactly: the same sections, headings, tables, columns and order, filled in completely. Do not add sections that are not in the template, except a short "${T.notes}" section at the end; if important content has no place in the template, put it in the closest section.`:`2. (no template) – use the default structure below.`}
+${hasTpl?`2. "${plan.templateName}" – a BLANK intervention-plan template used by the school${tplLang?` (written in ${TPL_LANG_NAME[tplLang]||tplLang})`:''}. The plan MUST follow this template exactly: the same sections, headings, tables, columns and order, filled in completely. Do not add sections that are not in the template, except a short "${T.notes}" section at the end; if important content has no place in the template, put it in the closest section.${tplRule}`:`2. (no template) – use the default structure below.`}
 
 Details (${meta}):
-- Plan for: ${none?'ALL the classes that appear in the summary report (the teacher did not choose specific classes)':(many?`these classes: ${clsTxt}`:`class ${clsTxt}`)}.${!none?' If the report covers other classes too, build the plan only for the classes listed, but you may use the grade-level findings for context.':''}${many||none?`
+- Plan for: ${none?(LIST.length?`ALL the classes in the summary report (the teacher did not choose specific classes): ${LIST.map(c=>`"${c}"`).join(', ')}`:'ALL the classes that appear in the summary report (the teacher did not choose specific classes)'):(chosen.length>1?`these classes: ${clsTxt}`:`class ${clsTxt}`)}.${!none?' If the report covers other classes too, build the plan only for the classes listed, but you may use the grade-level findings for context.':''}${many?`
 - One plan document for all of these classes: a shared part (the starting point and the goals for each grade level, and the resources), then a separate section for EACH class with its own target groups (names from the report), resource allocation, timetable and progress checkpoints. Where classes of the same grade share a weak skill, say so and suggest joint activities or groups across classes when the timetable allows.${hasTpl?' Fill the attached template once for each class (a full copy of the template per class, one after the other in the same file), preceded by a short shared summary page.':''}`:''}
-- ${subj} lessons per week in the regular timetable: ${plan.weekly||'?'}${many||none?' (in each class)':''}.
+${weeklyLines}
 - Additional programs and resources (משאבים) available:
 ${progLines}
+- Mixing students from different classes in one group: ${mix}.
 - Implementation period: ${plan.from&&plan.to?`from ${plan.from} to ${plan.to}${weeks?` (about ${weeks} weeks)`:''}`:(plan.period||'(not stated – assume 8 weeks)')}.
 - How the teacher will check progress: ${monitor.length?monitor.join('; '):'(not stated – propose a suitable method)'}.
-${plan.extra?`- Teacher's additional notes: ${plan.extra}\n`:''}${bandTxt?`- Score ranges (المجالات / טווחים) used in the report: ${bandTxt}.\n`:''}
+${plan.extra?`- Teacher's additional notes: ${plan.extra}\n`:''}${bandTxt}
 ${RULE}
 A. What to take from the summary report
 ${RULE}
@@ -1279,7 +1352,13 @@ B. Building the plan
 ${RULE}
 1) Goals: 2–4 measurable (SMART) goals for the period, each linked to a weak skill and to a target (e.g. raising the success rate in a skill from X% to Y%, or moving N students out of the lowest range).
 2) Target groups: groups of students by skill and level (names from the report), with the size of each group and its focus. Include a group for excelling students (enrichment / peer tutoring).
-3) Allocation of resources: decide which group works in which framework – the regular lessons (${plan.weekly||'?'} per week, with differentiated work inside the class) and each additional program listed above. Respect exactly the number of lessons per student per week in every program; do not plan more hours than are available, and show the total weekly hours per group in a table.
+3) Allocation of resources: decide which group works in which framework – the regular lessons of its class (see above, with differentiated work inside the class) and each additional program listed above. Respect exactly the number of lessons per student per week in every program; do not plan more hours than are available, and show the total weekly hours per group in a table.
+   Rules for lessons and resources:
+   - Show the regular lessons of each class separately, and show every program with its classes, its lessons per student and its weekly total.
+   - Every group works only in the programs available in its class(es).
+   - Every student in a program gets exactly the program's number of lessons per student per week – no more.
+   - The lessons of all the groups in a program together must not exceed the program's weekly total. If the total is not enough for a group in every class, set a priority order of the classes according to the report (the classes with the most students in the lowest range and the weakest skills first). Merge groups from different classes only if mixing is allowed (see above) and the students share the same weak skill. State explicitly which classes do not get a group in that program, and how their students are supported instead.
+   - In the shared part, include a table with: the group, its class or classes, its number of students, the program, the lessons per student, who delivers it, and each person's (or program's) total weekly lessons compared with what is available.
 4) Teaching strategies for every focus skill: specific, practical activities and materials suited to ${stageTxt} students and to ${subj}${STAGE==='elem'?' (short frequent activities, concrete materials, games, visual aids, reading in pairs)':' (guided practice, graphic organisers, metacognitive strategies, peer work, gradual release)'}.
 5) Timetable: a week-by-week (or two-week) schedule for the whole period – what is taught to each group, in which framework, and when progress is checked.
 6) Progress monitoring: turn the teacher's method(s) above into concrete checkpoints (when, what is checked, with which tool), clear success indicators for each goal, and what to do if a group does not progress (adjusting the group, the strategy or the hours).
@@ -1289,14 +1368,14 @@ ${RULE}
 ${RULE}
 C. Output
 ${RULE}
-- One Word file (.docx), ${hasTpl?'built on the attached template':'titled "'+T.plan+' – '+subj+' – '+(none?'[classes]':CL.join(', '))+'"'}, in ${OUT}${subject==='english'?' (skill names may stay in English as in the report)':''}, right-to-left (RTL), ready to print.
+- One Word file (.docx), ${hasTpl?'built on the attached template':'titled "'+T.plan+' – '+subj+' – '+titleCls+'"'}, in ${P.lang}${subject==='english'?' (skill names may stay in English as in the report)':''}, right-to-left (RTL), ready to print.
 ${hasTpl?'':`- Default structure: 1. key details (class, subject, teacher, period, resources); 2. summary of the starting point from the report (one short paragraph + a small table of the focus skills and their success rates); 3. goals; 4. target groups; 5. resource allocation table; 6. strategies by skill; 7. timetable by weeks; 8. progress monitoring and success indicators; 9. roles and parents; 10. "${T.notes}".\n`}- Tables neat and short; use the colour scale of the report (red for weak, yellow for medium, green for mastered) only where it helps.
-- First page${hasTpl?' (keep the template\'s own header and title)':''}: the title "${T.plan} – ${subj} – ${none?'[classes]':CL.join(', ')}", the teacher's name${teacher.name?` (${teacher.name})`:''}${teacher.school?`, the school (${teacher.school})`:''}, the class${many||none?'es':''} and the period. Under them, one small, light-grey line (10 pt, centred): "${AR?'أُعدّ بمساعدة منصة ومضات ذكية – منى مصطفى':'הוכן בעזרת פלטפורמת ברקים חכמים – מונא מוסטפא'}", with the platform logo small above it (about 2 cm; logo at ${LOGO} – if you cannot download it, use the text only and do not stop or mention it).
+- First page${hasTpl?' (keep the template\'s own header and title)':''}: the title "${T.plan} – ${subj} – ${titleCls}", the teacher's name${teacher.name?` (${teacher.name})`:''}${teacher.school?`, the school (${teacher.school})`:''}, the class${many?'es':''} and the period. Under them, one small, light-grey line (10 pt, centred): "${P.prepared}", with the platform logo small above it (about 2 cm; logo at ${LOGO} – if you cannot download it, use the text only and do not stop or mention it).
 - A subtle footer on EVERY page without exception: small (8–9 pt), light-grey text, not bold, centred, containing exactly the platform name:
-  ${brandOf(out)}
+  ${P.footer}
   Put the platform logo very small (about 0.8 cm high) next to the name. The logo is at ${LOGO} ; if you cannot download it, use the text only and do not stop or mention it.
 - Before delivering, confirm that the footer with the logo really appears on every page.
-- Check that the hours in the plan add up to the hours available${many||none?' in each class':''} and that every student named in the report as high priority${many||none?' in each of these classes':''} appears in a group.
+- Check before delivering: the lessons of every program and every person do not exceed what is available; every student named in the report as high priority${many?' in each of these classes':''} appears in a group${hasTpl?'; and, when the template language differs from the plan language, every heading of the template is followed by its translation in brackets':''}.
 
 ⚠️ Final reminder: do not ask any question and do not stop midway. Deliver the complete intervention plan as a Word file.`;
 }
@@ -1314,11 +1393,19 @@ const st={
   subject:'arabic', otherName:'', otherLang:'he', nClasses:'',
   nb:4, bands:null, bandsTouched:false,
   res:null, fileName:'', readErr:'', skipRead:false,
-  plan:{classes:[],clsDraft:'',weekly:'',programs:[{name:'',hours:'',who:'',staff:''}],from:'',to:'',monitor:[],monitorOther:'',extra:'',templateName:'',reportName:''}
+  plan:{lang:null,classes:[],clsDraft:'',weeklySame:true,weeklyAll:'',weekly:{},programs:[newProg()],mix:'stage',templateLang:'',templateDetected:'',from:'',to:'',monitor:[],monitorOther:'',extra:'',templateName:'',reportName:''}
 };
 const T=()=>I18N[st.lang||'ar'];
+function newProg(){ return {name:'',staff:'',classes:[],hours:'',target:'',total:''}; }
+/* the score ranges are saved with the report (when its prompt is copied) and reused for the plan */
+function loadReportBands(){ try{ const v=JSON.parse(localStorage.getItem('wm_report_bands')||'null'); return v&&Array.isArray(v.bands)?v:null; }catch(_){ return null; } }
+function saveReportBands(){ if(validateBands(st.bands)) return; st.reportBands={bands:JSON.parse(JSON.stringify(st.bands)),at:new Date().toISOString().slice(0,10)}; try{ localStorage.setItem('wm_report_bands',JSON.stringify(st.reportBands)); }catch(_){ } }
+function planLang(){ return st.plan.lang||planDefaultLang(st.subject); }
+function knownClasses(){ return (st.res&&st.res.classes||[]).map(c=>c.name); }
+function planList(){ return planClassList(st.plan,knownClasses()); }
 function outLang(){ return st.subject==='other'?st.otherLang:(st.subject==='arabic'?'ar':'he'); }
 function resetBands(){ st.bands=presetBands(outLang(),st.nb); }
+st.reportBands=loadReportBands();
 resetBands();
 function stage(){ return stageOf(st.teacher,(st.res&&st.res.classes||[]).map(c=>c.name)); }
 const logo=(cls)=>`<img src="${LOGO_DATA}" alt="ومضات ذكية – Smart Sparks" class="${cls}">`;
@@ -1464,26 +1551,43 @@ function renderReportPrompt(){
   $('#rprompt').innerHTML=promptCard('report',[t.rs1,fmt(t.rs2,{'%F':st.fileName?` (<bdi><b>${esc(st.fileName)}</b></bdi>)`:''}),t.rs3],blocked);
 }
 function renderPlan(){
-  const t=T(), P=st.plan, cls=(st.res&&st.res.classes||[]).map(c=>c.name);
+  const t=T(), P=st.plan, cls=knownClasses(), L=planList(), PL=planLang();
+  const tplNote=P.templateName?(P.templateDetected?fmt(t.tplDetected,{'%L':t['lang_'+P.templateDetected]}):t.tplUnknown):'';
   $('#plan').innerHTML=`
   <div class="grid2">
+    <label>${t.pLang}<select id="p-lang"><option value="he" ${PL==='he'?'selected':''}>עברית</option><option value="ar" ${PL==='ar'?'selected':''}>العربية</option></select>
+      <span class="muted">${t.pLangHint}</span></label>
+    <div></div>
     <div class="full"><label>${t.pCls} <span class="opt">${t.opt}</span></label>
       <div class="chips">${[...new Set([...cls,...P.classes])].map(c=>`<button class="cpick ${P.classes.includes(c)?'on':''}" data-pc="${esc(c)}"><bdi>${esc(c)}</bdi>${P.classes.includes(c)?' ✓':''}</button>`).join('')}
         ${cls.length?`<button class="link" id="pcAll">${t.pcAll}</button>${P.classes.length?`<button class="link" id="pcNone">${t.pcNone}</button>`:''}`:''}</div>
       <div class="row addcls"><input id="p-cls" value="${esc(P.clsDraft)}" placeholder="${t.pClsPh}" dir="auto"><button class="pill" id="pcAdd">${t.pcAdd}</button></div>
       <p class="muted">${P.classes.length?fmt(t.pcSome,{'%N':P.classes.length}):t.pcHint}</p></div>
-    <label>${t.pWeekly}<input id="p-weekly" type="number" min="0" value="${esc(P.weekly)}" placeholder="${t.pWeeklyPh}"></label>
+  </div>
+  <h4>${t.pWeekly}</h4>
+  ${L.length?`<label class="ck"><input type="checkbox" id="p-same" ${P.weeklySame?'checked':''}> ${t.wkSame}</label>`:''}
+  ${P.weeklySame||!L.length
+    ? `<div class="row wk"><input id="p-wall" type="number" min="0" value="${esc(P.weeklyAll)}" placeholder="${t.pWeeklyPh}"><span class="muted">${L.length?fmt(t.wkAllN,{'%N':L.length}):t.wkEach}</span></div>`
+    : `<table class="bt wkt"><thead><tr><th>${t.wkCls}</th><th>${t.wkN}</th></tr></thead><tbody>${L.map(c=>`<tr><td><bdi>${esc(c)}</bdi></td><td><input data-wk="${esc(c)}" type="number" min="0" value="${esc(P.weekly[c]??'')}"></td></tr>`).join('')}</tbody></table>`}
+  <div class="grid2">
     <label>${t.pFrom}<input id="p-from" type="date" value="${esc(P.from)}"></label>
     <label>${t.pTo}<input id="p-to" type="date" value="${esc(P.to)}"></label>
   </div>
   <h4>${t.progs}</h4><p class="muted">${t.progsHint}</p>
-  <div class="progs">${P.programs.map((p,i)=>`<div class="prow">
-    <label>${t.prName}<input data-p="${i}" data-f="name" value="${esc(p.name)}" placeholder="${t.prNamePh}" dir="auto"></label>
-    <label>${t.prHours}<input data-p="${i}" data-f="hours" type="number" min="0" step="0.5" value="${esc(p.hours)}"></label>
-    <label>${t.prWho} <span class="opt">${t.opt}</span><input data-p="${i}" data-f="who" value="${esc(p.who)}" placeholder="${t.prWhoPh}" dir="auto"></label>
-    <label>${t.prStaff} <span class="opt">${t.opt}</span><input data-p="${i}" data-f="staff" value="${esc(p.staff)}" placeholder="${t.prStaffPh}" dir="auto"></label>
-    <button class="x" data-del="${i}" title="${t.del}">✕</button></div>`).join('')}</div>
+  <div class="progs">${P.programs.map((p,i)=>`<div class="prow2">
+    <div class="grid2">
+      <label>${t.prName}<input data-p="${i}" data-f="name" value="${esc(p.name)}" placeholder="${t.prNamePh}" dir="auto"></label>
+      <label>${t.prStaff}<input data-p="${i}" data-f="staff" value="${esc(p.staff)}" placeholder="${t.prStaffPh}" dir="auto"></label>
+      <label>${t.prHours}<input data-p="${i}" data-f="hours" type="number" min="0" step="0.5" value="${esc(p.hours)}"></label>
+      <label>${t.prTotal} <span class="req">*</span><input data-p="${i}" data-f="total" type="number" min="0" step="0.5" value="${esc(p.total)}"></label>
+      <label class="full">${t.prTarget}<input data-p="${i}" data-f="target" value="${esc(p.target)}" placeholder="${t.prTargetPh}" dir="auto"></label>
+    </div>
+    ${L.length?`<div class="pcl"><span class="muted">${t.prCls}</span> ${L.map(c=>{ const on=(p.classes||[]).includes(c)||!(p.classes||[]).filter(x=>L.includes(x)).length; return `<button class="cpick sm ${on?'on':''}" data-pp="${i}" data-c="${esc(c)}"><bdi>${esc(c)}</bdi></button>`; }).join('')}</div>`:''}
+    <div class="pwarn" id="pw-${i}">${progWarn(p)}</div>
+    <button class="x" data-del="${i}" title="${t.del}">✕ ${t.del}</button></div>`).join('')}</div>
   <button class="link" id="addProg">${t.addProg}</button>
+  <h4>${t.mixQ} <span class="opt">${t.opt}</span></h4>
+  <div class="row">${[['yes',t.mixYes],['stage',t.mixStage],['no',t.mixNo]].map(([k,l])=>`<button class="pill ${P.mix===k?'on':''}" data-mix="${k}">${l}</button>`).join('')}</div>
   <h4>${t.mon}</h4>
   <div class="checks">${t.monitor.map((a,i)=>`<label class="ck"><input type="checkbox" data-m="${i}" ${P.monitor.includes(MONITOR_EN[i])?'checked':''}> ${a}</label>`).join('')}</div>
   <label>${t.monOther} <span class="opt">${t.opt}</span><input id="p-mo" value="${esc(P.monitorOther)}" dir="auto"></label>
@@ -1492,26 +1596,63 @@ function renderPlan(){
   <div class="grid2">
     <label class="drop small"><input type="file" id="p-rep" accept=".docx,.pdf,.doc" hidden><div class="big">📄</div>
       <b>${P.reportName?`<bdi>${esc(P.reportName)}</bdi>`:t.fRep}</b><div class="muted">${t.fRepSub}</div></label>
-    <label class="drop small"><input type="file" id="p-tpl" accept=".docx,.doc,.pdf,.xlsx" hidden><div class="big">🗂️</div>
+    <label class="drop small"><input type="file" id="p-tpl" accept=".docx,.doc,.pdf,.xlsx,.xls" hidden><div class="big">🗂️</div>
       <b>${P.templateName?`<bdi>${esc(P.templateName)}</bdi>`:t.fTpl}</b><div class="muted">${t.fTplSub}</div></label>
   </div>
-  ${P.templateName?`<button class="link" id="p-tpl-x">${t.noTpl}</button>`:''}
-  <p class="muted">${t.fNote}</p>`;
+  ${P.templateName?`<div class="row tpl"><span>${tplNote}</span>
+    <label class="inl">${t.tplLang}<select id="p-tlang"><option value="" ${!P.templateLang?'selected':''}>—</option>${['he','ar','en'].map(l=>`<option value="${l}" ${P.templateLang===l?'selected':''}>${t['lang_'+l]}</option>`).join('')}</select></label>
+    <button class="link" id="p-tpl-x">${t.noTpl}</button></div>
+    ${P.templateLang&&P.templateLang!==PL?`<p class="note">ℹ️ ${fmt(t.tplMix,{'%T':t['lang_'+P.templateLang],'%P':t['lang_'+PL]})}</p>`:''}`:''}
+  <p class="muted">${t.fNote}</p>
+  <p class="muted">📏 ${st.reportBands?fmt(t.bandsSaved,{'%B':st.reportBands.bands.map((b,i)=>`${esc(b.name)} (${bandRangeLabel(st.reportBands.bands,i)})`).join(' · ')})+` <span dir="ltr">(${st.reportBands.at})</span> <button class="link" id="bandsForget">${t.bandsForget}</button>`:t.bandsFromReport}</p>`;
+}
+function progWarn(p){
+  const t=T(), L=planList();
+  if(!p.name||!p.name.trim()) return '';
+  const h=Number(p.hours)||0, tot=p.total===''?null:Number(p.total);
+  if(tot===null) return `<span class="err">⚠️ ${t.prNeedTotal}</span>`;
+  if(h>0&&tot<h) return `<span class="err">⚠️ ${t.prTotalLow}</span>`;
+  if(L.length&&programShort(p,L)) return `<span class="warn">⚠️ ${t.prShort}</span>`;
+  return '';
 }
 function planBlocked(){
-  const t=T(), P=st.plan;
+  const t=T(), P=st.plan, L=planList();
   if(!st.teacher.grade) return t.needGradeTop;
   if(st.subject==='other'&&!st.otherName.trim()) return t.needOtherTop;
-  if(!P.weekly) return t.needWeekly;
+  if(P.weeklySame||!L.length){ if(!P.weeklyAll) return t.needWeekly; }
+  else if(L.some(c=>!P.weekly[c])) return t.needWeeklyEach;
   if(!P.from||!P.to) return t.needPeriod;
   if(new Date(P.to)<=new Date(P.from)) return t.badPeriod;
+  for(const p of P.programs){ if(!p.name||!p.name.trim()) continue;
+    if(!(Number(p.hours)>0)) return fmt(t.needProgHours,{'%P':esc(p.name)});
+    if(p.total===''||!(Number(p.total)>=Number(p.hours))) return fmt(t.needProgTotal,{'%P':esc(p.name)}); }
   if(!P.monitor.length&&!P.monitorOther.trim()) return t.needMon;
   return '';
 }
 function renderPlanPrompt(){
   const t=T(), blocked=planBlocked(), P=st.plan;
-  PROMPTS.plan=blocked?'':buildPlanPrompt({teacher:st.teacher,subject:st.subject,otherName:st.otherName,otherLang:st.otherLang,plan:P,bands:validateBands(st.bands)?null:st.bands});
+  PROMPTS.plan=blocked?'':buildPlanPrompt({teacher:st.teacher,subject:st.subject,otherName:st.otherName,plan:{...P,lang:planLang()},reportBands:st.reportBands&&st.reportBands.bands,knownClasses:knownClasses()});
   $('#pprompt').innerHTML=promptCard('plan',[t.rs1,fmt(t.ps2,{'%R':P.reportName?` (<bdi><b>${esc(P.reportName)}</b></bdi>)`:'','%T':P.templateName?fmt(t.psTpl,{'%N':`<bdi><b>${esc(P.templateName)}</b></bdi>`}):''}),t.ps3],blocked);
+}
+/* template language: read the file in the browser and count Hebrew / Arabic / Latin letters */
+async function detectTemplateLang(f){
+  let text='';
+  const name=f.name.toLowerCase();
+  try{
+    if(/\.docx$/.test(name)&&typeof JSZip!=='undefined'){
+      const z=await JSZip.loadAsync(await f.arrayBuffer());
+      for(const n of Object.keys(z.files).filter(n=>/^word\/(document|header\d*|footer\d*)\.xml$/.test(n))) text+=' '+(await z.file(n).async('string')).replace(/<[^>]+>/g,' ');
+    } else if(/\.xlsx?$/.test(name)&&typeof XLSX!=='undefined'){
+      const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
+      wb.SheetNames.forEach(n=>{ text+=' '+XLSX.utils.sheet_to_csv(wb.Sheets[n]); });
+    } else if(/\.pdf$/.test(name)&&window.pdfjsLib){
+      const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
+      for(let i=1;i<=Math.min(pdf.numPages,3);i++){ const c=await (await pdf.getPage(i)).getTextContent(); text+=' '+c.items.map(x=>x.str).join(' '); }
+    }
+  }catch(e){ console.warn('template language',e); }
+  const he=(text.match(/[א-ת]/g)||[]).length, ar=(text.match(/[ء-ي]/g)||[]).length, en=(text.match(/[A-Za-z]/g)||[]).length*0.5;
+  const m=Math.max(he,ar,en); if(m<15) return '';
+  return m===he?'he':m===ar?'ar':'en';
 }
 function renderTabs(){
   document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===st.tab));
@@ -1557,8 +1698,10 @@ document.addEventListener('input',e=>{
     if(d.f==='max'){ const box=$('#issues'), open=box&&box.querySelector('details').open, html=issuesBox();
       if(box){ if(html){ box.outerHTML=html; if(open) $('#issues details').open=true; } else box.remove(); } }
     return; }
-  if(d.p!==undefined){ st.plan.programs[+d.p][d.f]=el.value; renderPlanPrompt(); return; }
-  const pm={'p-cls':'clsDraft','p-weekly':'weekly','p-from':'from','p-to':'to','p-mo':'monitorOther','p-extra':'extra'};
+  if(d.p!==undefined){ const p=st.plan.programs[+d.p]; p[d.f]=el.value; const w=$('#pw-'+d.p); if(w) w.innerHTML=progWarn(p); renderPlanPrompt(); return; }
+  if(d.wk!==undefined){ st.plan.weekly[d.wk]=el.value; renderPlanPrompt(); return; }
+  if(el.id==='p-wall'){ st.plan.weeklyAll=el.value; renderPlanPrompt(); return; }
+  const pm={'p-cls':'clsDraft','p-from':'from','p-to':'to','p-mo':'monitorOther','p-extra':'extra'};
   if(pm[el.id]){ st.plan[pm[el.id]]=el.value; renderPlanPrompt(); }
 });
 document.addEventListener('change',e=>{
@@ -1568,7 +1711,14 @@ document.addEventListener('change',e=>{
   else if(el.id==='grade'){ const i=GRADE_HE.indexOf(el.value); st.teacher.grade=el.value; st.teacher.gradeLabel=i>=0?gradeLabel(i):''; renderTeacher(); refreshPrompts(); }
   else if(el.id==='xl'){ handleFile(el.files[0]); el.value=''; }
   else if(el.id==='p-rep'){ st.plan.reportName=el.files[0]?el.files[0].name:''; renderPlan(); renderPlanPrompt(); }
-  else if(el.id==='p-tpl'){ st.plan.templateName=el.files[0]?el.files[0].name:''; renderPlan(); renderPlanPrompt(); }
+  else if(el.id==='p-tpl'){ const f=el.files[0]; st.plan.templateName=f?f.name:''; st.plan.templateLang=''; st.plan.templateDetected='';
+    renderPlan(); renderPlanPrompt();
+    if(f) detectTemplateLang(f).then(l=>{ if(st.plan.templateName!==f.name) return; st.plan.templateDetected=l; st.plan.templateLang=l; renderPlan(); renderPlanPrompt(); }); }
+  else if(el.id==='p-tlang'){ st.plan.templateLang=el.value; renderPlan(); renderPlanPrompt(); }
+  else if(el.id==='p-lang'){ st.plan.lang=el.value; renderPlan(); renderPlanPrompt(); }
+  else if(el.id==='p-same'){ const L=planList(); st.plan.weeklySame=el.checked;
+    if(!el.checked&&st.plan.weeklyAll) L.forEach(c=>{ if(!st.plan.weekly[c]) st.plan.weekly[c]=st.plan.weeklyAll; });
+    renderPlan(); renderPlanPrompt(); }
   else if(el.dataset.m!==undefined){ const v=MONITOR_EN[+el.dataset.m]; st.plan.monitor=el.checked?[...st.plan.monitor,v]:st.plan.monitor.filter(x=>x!==v); renderPlanPrompt(); }
 });
 document.addEventListener('click',e=>{
@@ -1583,11 +1733,16 @@ document.addEventListener('click',e=>{
   if(el.id==='pcAll'){ st.plan.classes=[...new Set([...(st.res&&st.res.classes||[]).map(c=>c.name),...st.plan.classes])]; renderPlan(); renderPlanPrompt(); return; }
   if(el.id==='pcNone'){ st.plan.classes=[]; renderPlan(); renderPlanPrompt(); return; }
   if(el.id==='pcAdd'){ addDraftClasses(); return; }
-  if(el.id==='addProg'){ st.plan.programs.push({name:'',hours:'',who:'',staff:''}); renderPlan(); return; }
-  if(d.del!==undefined){ st.plan.programs.splice(+d.del,1); if(!st.plan.programs.length) st.plan.programs.push({name:'',hours:'',who:'',staff:''}); renderPlan(); renderPlanPrompt(); return; }
-  if(el.id==='p-tpl-x'){ st.plan.templateName=''; renderPlan(); renderPlanPrompt(); return; }
+  if(el.id==='addProg'){ st.plan.programs.push(newProg()); renderPlan(); return; }
+  if(d.del!==undefined){ st.plan.programs.splice(+d.del,1); if(!st.plan.programs.length) st.plan.programs.push(newProg()); renderPlan(); renderPlanPrompt(); return; }
+  if(el.id==='p-tpl-x'){ st.plan.templateName=''; st.plan.templateLang=''; st.plan.templateDetected=''; renderPlan(); renderPlanPrompt(); return; }
+  if(d.pp!==undefined){ const p=st.plan.programs[+d.pp], L=planList(); let cur=(p.classes||[]).filter(x=>L.includes(x)); if(!cur.length) cur=L.slice();
+    cur=cur.includes(d.c)?cur.filter(x=>x!==d.c):[...cur,d.c]; p.classes=cur.length===L.length?[]:cur; if(!cur.length) p.classes=[];
+    renderPlan(); renderPlanPrompt(); return; }
+  if(el.id==='bandsForget'){ st.reportBands=null; try{ localStorage.removeItem('wm_report_bands'); }catch(_){ } renderPlan(); renderPlanPrompt(); return; }
+  if(d.mix){ st.plan.mix=d.mix; renderPlan(); renderPlanPrompt(); return; }
   if(d.toggle){ const p=$('#pre-'+d.toggle); p.hidden=!p.hidden; el.textContent=p.hidden?t.show:t.hide; return; }
-  if(d.copy){ copyText(PROMPTS[d.copy],d.copy); return; }
+  if(d.copy){ if(d.copy==='report'){ saveReportBands(); } copyText(PROMPTS[d.copy],d.copy); if(d.copy==='report') renderPlan(); return; }
 });
 function addDraftClasses(){
   const parts=st.plan.clsDraft.split(/[,،;\n]+/).map(s=>s.trim()).filter(Boolean);
