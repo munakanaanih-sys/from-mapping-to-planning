@@ -28,7 +28,13 @@ body{font-family:'Cairo',system-ui,sans-serif;background:linear-gradient(135deg,
 .sp-card p{color:rgba(255,255,255,.75);font-weight:600;margin-bottom:26px}
 .sp-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
 .sp-btns button{flex:1;min-width:130px;max-width:180px;padding:18px 14px;border-radius:20px;color:#fff;font:inherit;font-weight:800;font-size:1.05rem;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:6px}
-.sp-btns button:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(0,0,0,.45)}.sp-btns span{font-size:1.6rem}
+.sp-btns button:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(0,0,0,.45)}
+.cover-switch{position:absolute;top:18px;inset-inline-end:18px;z-index:2;display:flex;gap:4px;padding:5px;border-radius:999px;background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.25)}
+.cs-btn{border:none;background:transparent;color:#64748b;font:inherit;font-weight:800;font-size:.95rem;padding:8px 18px;border-radius:999px;cursor:pointer;transition:all .2s}
+.cs-btn:hover{color:#0f2749}.cs-btn.on{background:linear-gradient(135deg,#1e90ff,#06c8d8);color:#fff;box-shadow:0 4px 14px rgba(14,165,233,.45)}
+@media(max-width:480px){.cover-switch{top:12px;inset-inline-end:12px}.cs-btn{padding:6px 12px;font-size:.85rem}.sp-head{margin-top:40px}}
+.lb-ic{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;font-size:1.35rem;font-weight:900}
+.lb-ar{background:linear-gradient(135deg,#10b981,#047857)}.lb-he{background:linear-gradient(135deg,#f43f5e,#be123c)}.lb-en{background:linear-gradient(135deg,#06b6d4,#0e7490)}
 .sp-foot{margin-top:36px;color:rgba(255,255,255,.3);font-size:.78rem;font-weight:600;position:relative;z-index:1}
 /* page */
 .page{max-width:900px;margin:0 auto;background:rgba(255,255,255,.97);box-shadow:0 4px 40px rgba(0,0,0,.15);min-height:100vh}
@@ -40,7 +46,7 @@ body{font-family:'Cairo',system-ui,sans-serif;background:linear-gradient(135deg,
 .sh-sub{font-size:1rem;font-weight:800;color:var(--gold);margin-top:6px}
 .lang-switch{display:inline-flex;gap:4px;padding:4px;border-radius:50px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);margin:0 auto 14px}
 .ls-btn{border:none;background:transparent;color:rgba(255,255,255,.85);font:inherit;font-weight:700;font-size:.82rem;padding:5px 14px;border-radius:50px;cursor:pointer}
-.ls-btn:hover{background:rgba(255,255,255,.15)}.ls-btn.on{background:var(--gold);color:#0f2749}
+.ls-btn:hover{background:rgba(255,255,255,.15)}.ls-btn.on{color:#fff}.ls-ar.on{background:#059669}.ls-he.on{background:#e11d48}.ls-en.on{background:#0891b2}.ls-ic{padding:0 6px 0 4px;font-size:.9rem;align-self:center}
 main{padding:22px 18px 10px}
 .intro{color:#475569;font-size:.95rem;text-align:center;max-width:680px;margin:0 auto 18px}
 .card{background:#fff;border:1px solid #eef2f7;border-radius:20px;box-shadow:0 4px 18px rgba(15,23,42,.06);padding:20px;margin-bottom:16px}
@@ -109,7 +115,7 @@ ar:{dir:'rtl',
   issTitle:'تنبيهات على الملف – يُستحسن تصحيحها', issOver:'%N علامة أعلى من العلامة القصوى للسؤال', issAbs:'%N طالب بلا علامات لكن مجموعه 0 (غائب، لم يُحسب)', issTot:'%N مجموع مكتوب لا يساوي مجموع العلامات', issNoTot:'%N طالب له علامات بلا مجموع مكتوب',
   issHint:'المنصة تحسب العلامة الزائدة كعلامة قصوى وتستثني الغائبين، لذلك قد يختلف المعدل قليلًا عن ورقة الملخص في الملف. Claude سيضع قائمة كاملة بها في ورقة الملاحظات.', issMore:'عرض التفاصيل', row:'صف', cSheet:'الصف', cWhere:'الخلية', cName:'الطالب', cWhat:'الملاحظة', dOver:'%V من %M', dAbs:'غائب – مجموع 0', dTot:'المجموع %S ≠ المكتوب %T', dNoTot:'بلا مجموع (Σ %S)',
   brand:'ومضات ذكية مع منى مصطفى', name:'من المسح الصفي إلى خطة التدخل',
-  badge:'مركزة تقييم — منى مصطفى', splashLabel:'اختر لغتك', splashFooter:'منصة ومضات ذكية',
+  badge:'مركزة تقييم — منى مصطفى', splashLabel:'اختر/ي لغة المنصة',  coverLang:'لغة صفحة الغلاف', splashFooter:'منصة ومضات ذكية',
   intro:'ارفع/ي ملف الإكسل الذي فيه نتائج المسح الصفي – حتى لو لم يُنشأ في منصة المسح – واحصل/ي على برومبت جاهز لـ Claude يبني التحليل الكامل والتقرير الملخّص (דוח מסכם)، ثم برومبت لخطة التدخل (תוכנית התערבות).',
   back:'تغيير اللغة',
   c1:'بيانات المعلم/ة والمسح', tName:'اسم المعلم/ة', tNamePh:'مثال: منى مصطفى', school:'المدرسة', opt:'(اختياري)',
@@ -166,8 +172,8 @@ he:{dir:'rtl',
   version:'גרסה %1 של המבדק', versionsNote:'בקובץ יש %1 גרסאות שונות של המבדק (שאלות או ניקוד שונים). כל כיתה תנותח לפי הגרסה שלה.', colSec:'חלק',
   issTitle:'הערות על הקובץ – כדאי לתקן', issOver:'%N ציונים גבוהים מהניקוד המרבי של השאלה', issAbs:'%N תלמידים בלי ציונים אבל עם סה"כ 0 (נעדרים, לא נספרו)', issTot:'%N סיכומים מוקלדים שאינם שווים לסכום הציונים', issNoTot:'%N תלמידים עם ציונים בלי סה"כ מוקלד',
   issHint:'הפלטפורמה סופרת ציון חורג כניקוד המרבי ולא סופרת נעדרים, ולכן הממוצע עשוי להיות שונה מעט מגיליון הסיכום שבקובץ. Claude ירכז את הרשימה המלאה בגיליון ההערות.', issMore:'הצגת הפרטים', row:'שורה', cSheet:'כיתה', cWhere:'תא', cName:'תלמיד/ה', cWhat:'הערה', dOver:'%V מתוך %M', dAbs:'נעדר/ת – סה"כ 0', dTot:'סכום %S ≠ מוקלד %T', dNoTot:'בלי סה"כ (Σ %S)',
-  brand:'ברקים חכמים עם מונא מוסטפא', name:'מהמבדק הכיתתי לתוכנית ההתערבות',
-  badge:'רכזת הערכה — מונא מוסטפא', splashLabel:'בחרו שפה', splashFooter:'פלטפורמת ברקים חכמים',
+  brand:'ניצוצות חכמים עם מונא מוסטפא', name:'מהמבדק הכיתתי לתוכנית ההתערבות',
+  badge:'רכזת הערכה — מונא מוסטפא', splashLabel:'בחרו את שפת הפלטפורמה',  coverLang:'שפת דף השער', splashFooter:'פלטפורמת ניצוצות חכמים',
   intro:'העלו את קובץ האקסל עם תוצאות המבדק הכיתתי – גם אם לא נוצר בפלטפורמת המבדק – וקבלו פרומפט מוכן ל-Claude שבונה ניתוח מלא ודוח מסכם, ואחר כך פרומפט לתוכנית התערבות.',
   back:'החלפת שפה',
   c1:'פרטי המורה והמבדק', tName:'שם המורה', tNamePh:'לדוגמה: מונא מוסטפא', school:'בית הספר', opt:'(רשות)',
@@ -225,7 +231,7 @@ en:{dir:'ltr',
   issTitle:'Notes on the file – worth correcting', issOver:'%N scores above the question\'s maximum', issAbs:'%N students with no scores but a total of 0 (absent, not counted)', issTot:'%N typed totals that differ from the sum of the scores', issNoTot:'%N students with scores but no typed total',
   issHint:'The platform counts a score above the maximum as the maximum and leaves absent students out, so the averages may differ slightly from the summary sheet in the file. Claude will list every item in the notes sheet.', issMore:'Show details', row:'row', cSheet:'Class', cWhere:'Cell', cName:'Student', cWhat:'Note', dOver:'%V of %M', dAbs:'absent – total 0', dTot:'sum %S ≠ typed %T', dNoTot:'no total (Σ %S)',
   brand:'Smart Sparks with Mona Mustafa', name:'From Class Screening to Intervention Plan',
-  badge:'Assessment Coordinator — Mona Mustafa', splashLabel:'Choose your language', splashFooter:'Smart Sparks Platform',
+  badge:'Assessment Coordinator — Mona Mustafa', splashLabel:'Choose the platform language',  coverLang:'Cover page language', splashFooter:'Smart Sparks Platform',
   intro:'Upload the Excel file with the class-screening results – even if it was not created on the screening platform – and get a ready prompt for Claude that builds the full analysis and the summary report (דוח מסכם), then a prompt for the intervention plan (תוכנית התערבות).',
   back:'Change language',
   c1:'Teacher and screening details', tName:'Teacher name', tNamePh:'e.g. Mona Mustafa', school:'School', opt:'(optional)',
@@ -992,7 +998,7 @@ function liveIssues(res){
    Same report structure as the class-screening platform (detailed Excel + short Word דוח מסכם),
    but built from the teacher's details and the structure this page read from the attached file. */
 const LOGO="https://i.postimg.cc/SNgVgv8L/my-new-icon.png";
-const BRAND={ar:'ومضات ذكية مع منى مصطفى',he:'ברקים חכמים עם מונא מוסטפא'};
+const BRAND={ar:'ومضات ذكية مع منى مصطفى',he:'ניצוצות חכמים עם מונא מוסטפא'};
 const brandOf=(l)=>BRAND[l]||BRAND.ar;
 /* the grade the teacher chose decides the stage; the class names are used only if no grade was chosen */
 function stageOf(teacher,classes){ const g=gradeNumber(teacher&&teacher.grade); if(g!==null) return g<=6?'elem':'mid'; return detectStage(teacher,classes); }
@@ -1226,7 +1232,7 @@ ${RULE}
    - At most 2–3 pages per class, plus a cover page and a one-page overall summary.
 
    Word structure:
-   1. Cover page: the title "${S.title} – [grade level(s)]", ${teacher.name?`the teacher's name (${teacher.name}), `:''}${teacher.school?`the school (${teacher.school}), `:''}the classes included (with their names from the file), and the date${teacher.date?` (${teacher.date})`:''}. Under them, one small, light-grey line (10 pt, centred): "${AR?'أُعدّ بمساعدة منصة ومضات ذكية – منى مصطفى':'הוכן בעזרת פלטפורמת ברקים חכמים – מונא מוסטפא'}", with the platform logo small above it (about 2 cm; logo at ${LOGO} – if you cannot download it, use the text only and do not stop or mention it).
+   1. Cover page: the title "${S.title} – [grade level(s)]", ${teacher.name?`the teacher's name (${teacher.name}), `:''}${teacher.school?`the school (${teacher.school}), `:''}the classes included (with their names from the file), and the date${teacher.date?` (${teacher.date})`:''}. Under them, one small, light-grey line (10 pt, centred): "${AR?'أُعدّ بمساعدة منصة ومضات ذكية – منى مصطفى':'הוכן בסיוע פלטפורמת ניצוצות חכמים – מונא מוסטפא'}", with the platform logo small above it (about 2 cm; logo at ${LOGO} – if you cannot download it, use the text only and do not stop or mention it).
    2. Overall summary, one page: the 5 most important findings, and the colour legend (the ranges and their colours).
    3. ${multi?'For each grade level, in order: (a) for each class of that grade':'For each class, in order'}:
       a. A small table of key figures: number of students, class average, and the number of students in each of the ${nb} ranges.
@@ -1388,7 +1394,7 @@ const SUBJ_KEYS=['arabic','hebrew','english','math','science','other'];
 const MONITOR_EN=['an interim screening in the middle of the period','short periodic quizzes','performance tasks and worksheets','classroom observation with a checklist','a student portfolio','a final screening with the same structure as the original one'];
 const fmt=(s,o)=>Object.keys(o).reduce((a,k)=>a.split(k).join(o[k]),s);
 const st={
-  lang:null, tab:'report',
+  lang:null, splashLang:(()=>{ try{ const l=localStorage.getItem('wm_lang'); return ['ar','he','en'].includes(l)?l:'ar'; }catch(_){ return 'ar'; } })(), tab:'report',
   teacher:{name:'',school:'',date:new Date().toISOString().slice(0,10),grade:'',gradeLabel:''},
   subject:'arabic', otherName:'', otherLang:'he', nClasses:'',
   nb:4, bands:null, bandsTouched:false,
@@ -1409,25 +1415,26 @@ st.reportBands=loadReportBands();
 resetBands();
 function stage(){ return stageOf(st.teacher,(st.res&&st.res.classes||[]).map(c=>c.name)); }
 const logo=(cls)=>`<img src="${LOGO_DATA}" alt="ومضات ذكية – Smart Sparks" class="${cls}">`;
-const langSwitch=()=>`<div class="lang-switch" role="group" aria-label="Language / اللغة / שפה">${[['ar','العربية'],['he','עברית'],['en','English']].map(([l,n])=>`<button class="ls-btn ${st.lang===l?'on':''}" data-lang="${l}" lang="${l}">${n}</button>`).join('')}</div>`;
+const langSwitch=()=>`<div class="lang-switch" role="group" aria-label="Language / اللغة / שפה"><span class="ls-ic">🌐</span>${[['ar','العربية'],['he','עברית'],['en','English']].map(([l,n])=>`<button class="ls-btn ls-${l} ${st.lang===l?'on':''}" data-lang="${l}" lang="${l}">${n}</button>`).join('')}</div>`;
 
 /* ── splash: language choice (as in the screening platform) ── */
 function renderSplash(){
+  const L=st.splashLang, t=I18N[L], fx=st.splashShown?'':'fade-in'; st.splashShown=true;
+  document.documentElement.lang=L; document.documentElement.dir=t.dir;
   $('#app').innerHTML=`<div class="splash">
     <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
-    <div class="fade-in sp-head"><div class="sp-logo">${logo('')}</div>
-      <h1>${I18N.ar.brand}</h1><p class="gold">${I18N.ar.name}</p>
-      <p class="gold he">${I18N.he.name} · ${I18N.en.name}</p>
-      <div class="sp-badge">🎓 ${I18N.ar.badge}</div></div>
-    <div class="fade-in sp-card"><p>${I18N.ar.splashLabel} &nbsp;/&nbsp; ${I18N.he.splashLabel} &nbsp;/&nbsp; ${I18N.en.splashLabel}</p>
+    <div class="cover-switch" role="group" aria-label="${t.coverLang}">${[['ar','العربية'],['he','עברית'],['en','English']].map(([l,n])=>`<button class="cs-btn ${L===l?'on':''}" data-splash="${l}" lang="${l}">${n}</button>`).join('')}</div>
+    <div class="${fx} sp-head"><div class="sp-logo">${logo('')}</div>
+      <h1>${t.brand}</h1><p class="gold">${t.name}</p>
+      <div class="sp-badge">🎓 ${t.badge}</div></div>
+    <div class="${fx} sp-card"><p>${t.splashLabel}</p>
       <div class="sp-btns">
-        <button data-lang="ar" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)"><span>🇸🇦</span>العربية</button>
-        <button data-lang="he" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)"><span>⭐</span>עברית</button>
-        <button data-lang="en" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><span>🌐</span>English</button>
+        <button data-lang="ar" class="lb-ar"><span class="lb-ic">ع</span>العربية</button>
+        <button data-lang="he" class="lb-he"><span class="lb-ic">ע</span>עברית</button>
+        <button data-lang="en" class="lb-en"><span class="lb-ic">A</span>English</button>
       </div></div>
-    <div class="sp-foot">✦ &nbsp; ${I18N.ar.splashFooter} · ${I18N.he.splashFooter} · ${I18N.en.splashFooter} &nbsp; ✦</div></div>`;
+    <div class="sp-foot">✦ &nbsp; ${t.splashFooter} &nbsp; ✦</div></div>`;
 }
-
 /* ── main layout ── */
 function renderShell(){
   const t=T();
@@ -1659,8 +1666,8 @@ function renderTabs(){
   $('#s-report').hidden=st.tab!=='report'; $('#s-plan').hidden=st.tab!=='plan';
 }
 function renderAll(){
-  document.documentElement.lang=st.lang||'ar'; document.documentElement.dir=st.lang?T().dir:'rtl';
   if(!st.lang){ renderSplash(); return; }
+  document.documentElement.lang=st.lang; document.documentElement.dir=T().dir;
   renderShell(); renderTeacher(); renderBands(); renderFile(); renderReportPrompt(); renderPlan(); renderPlanPrompt(); renderTabs();
 }
 function refreshPrompts(){ renderReportPrompt(); renderPlanPrompt(); }
@@ -1724,7 +1731,8 @@ document.addEventListener('change',e=>{
 document.addEventListener('click',e=>{
   const el=e.target.closest('button'); if(!el) return;
   const d=el.dataset, t=T();
-  if(d.lang){ st.lang=d.lang; renderAll(); window.scrollTo(0,0); return; }
+  if(d.splash){ st.splashLang=d.splash; try{ localStorage.setItem('wm_lang',d.splash); }catch(_){ } renderSplash(); return; }
+  if(d.lang){ st.lang=d.lang; st.splashLang=d.lang; try{ localStorage.setItem('wm_lang',d.lang); }catch(_){ } renderAll(); window.scrollTo(0,0); return; }
   if(d.tab){ st.tab=d.tab; renderTabs(); $('#tabs').scrollIntoView({behavior:'smooth'}); return; }
   if(d.nb){ st.nb=+d.nb; resetBands(); st.bandsTouched=true; renderBands(); refreshPrompts(); return; }
   if(el.id==='bandReset'){ resetBands(); st.bandsTouched=false; renderBands(); refreshPrompts(); return; }
